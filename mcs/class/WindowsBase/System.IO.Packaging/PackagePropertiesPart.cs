@@ -256,8 +256,6 @@ namespace System.IO.Packaging
 				coreProperties.AppendChild (doc.CreateNode (XmlNodeType.Element, "contentStatus", NSPackageProperties)).InnerXml = ContentStatus;
 			if (ContentType != null)
 			coreProperties.AppendChild (doc.CreateNode (XmlNodeType.Element, "contentType", NSPackageProperties)).InnerXml = ContentType;
-			if (Created.HasValue)
-				coreProperties.AppendChild (doc.CreateNode (XmlNodeType.Element, "dcterms", "created", NSDcTerms)).InnerXml = Created.Value.ToString ();
 			if (Creator != null)
 				coreProperties.AppendChild (doc.CreateNode (XmlNodeType.Element, "dc", "creator", NSDc)).InnerXml = Creator;
 			if (Description != null)
@@ -271,7 +269,7 @@ namespace System.IO.Packaging
 			if (LastModifiedBy != null)
 				coreProperties.AppendChild (doc.CreateNode (XmlNodeType.Element, "lastModifiedBy", NSPackageProperties)).InnerXml = LastModifiedBy;
 			if (LastPrinted.HasValue)
-				coreProperties.AppendChild (doc.CreateNode (XmlNodeType.Element, "lastPrinted", NSPackageProperties)).InnerXml = LastPrinted.Value.ToString ();
+				coreProperties.AppendChild (doc.CreateNode (XmlNodeType.Element, "lastPrinted", NSPackageProperties)).InnerXml = LastPrinted.Value.ToString ("yyyy-MM-ddTHH:mm:ssK");
 			if (Revision != null)
 				coreProperties.AppendChild (doc.CreateNode (XmlNodeType.Element, "revision", NSPackageProperties)).InnerXml = Revision;
 			if (Subject != null)
@@ -281,6 +279,15 @@ namespace System.IO.Packaging
 			if (Version != null)
 				coreProperties.AppendChild (doc.CreateNode (XmlNodeType.Element, "version", NSPackageProperties)).InnerXml = Version;
 
+			if (Created.HasValue)
+			{
+				XmlAttribute att = doc.CreateAttribute("xsi", "type", NSXsi);
+				att.Value = "dcterms:W3CDTF";
+				
+				XmlNode created = coreProperties.AppendChild (doc.CreateNode (XmlNodeType.Element, "dcterms", "created", NSDcTerms));
+				created.Attributes.Append (att);
+				created.InnerXml = Created.Value.ToString ("yyyy-MM-ddTHH:mm:ssK");
+			}
 			if (Modified.HasValue)
 			{
 				XmlAttribute att = doc.CreateAttribute("xsi", "type", NSXsi);
@@ -288,7 +295,7 @@ namespace System.IO.Packaging
 				
 				XmlNode modified = coreProperties.AppendChild (doc.CreateNode (XmlNodeType.Element, "dcterms", "modified", NSDcTerms));
 				modified.Attributes.Append (att);
-				modified.InnerXml = Modified.Value.ToString ();
+				modified.InnerXml = Modified.Value.ToString ("yyyy-MM-ddTHH:mm:ssK");
 			}
 			
 			doc.WriteContentTo (writer);
