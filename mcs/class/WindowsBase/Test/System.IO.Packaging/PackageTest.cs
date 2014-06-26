@@ -209,7 +209,9 @@ namespace System.IO.Packaging.Tests {
         {
             package = Package.Open (path, FileMode.Create);
             package.CreatePart (uris[0], contentType);
+
             package.CreateRelationship (uris[1], TargetMode.External, "relType");
+
             package.Close ();
             package = Package.Open (path, FileMode.Open, FileAccess.Read);
             Assert.AreEqual (2, package.GetParts ().Count (), "#1");
@@ -242,6 +244,28 @@ namespace System.IO.Packaging.Tests {
             } catch (IOException) {
 
             }
+	   
+	    //add a PackagePart which itselfs contains a RelationsShip 
+	    package.Close();
+            package = Package.Open (path, FileMode.Open);
+ 
+	    PackagePart packagePart = package.CreatePart(uris[1], contentType);
+	    	
+	    using(StreamWriter writer = new StreamWriter(packagePart.GetStream()))
+	    {
+	    	writer.Write("test");
+	    }
+            packagePart.CreateRelationship (uris[1], TargetMode.External, "relType");
+	    package.Close();
+
+	    //load package as read-only and verify relationships of previously add PackagePart
+            package = Package.Open (path, FileMode.Open, FileAccess.Read);
+            Assert.AreEqual (4, package.GetParts ().Count (), "#3");
+            Assert.AreEqual (1, package.GetRelationships ().Count (), "#4");
+            Assert.AreEqual (FileAccess.Read, package.FileOpenAccess, "Should be read access");
+            
+	    PackagePart lastPart = package.GetParts().ElementAt(2);
+            Assert.AreEqual (1, lastPart.GetRelationships ().Count (), "#5");
         }
 
         [Test]
