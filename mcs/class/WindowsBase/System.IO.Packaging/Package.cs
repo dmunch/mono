@@ -364,8 +364,8 @@ namespace System.IO.Packaging {
 
 		public static Package Open (Stream stream, FileMode packageMode)
 		{
-			FileAccess access = packageMode == FileMode.Open ? FileAccess.Read : FileAccess.ReadWrite;
-			return Open (stream, packageMode, access);
+			//FileAccess access = packageMode == FileMode.Open ? FileAccess.Read : FileAccess.ReadWrite;
+			return Open (stream, packageMode, FileAccess.ReadWrite);
 		}
 
 		public static Package Open (string path, FileMode packageMode)
